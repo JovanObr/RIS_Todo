@@ -102,7 +102,7 @@ Todo/
 │
 ├── database/                             # Docker configuration (optional)
 │   ├── database-setup.sql                # Initial database setup
-│   └── databse-subtasks.sql              # Database Subtasks setup
+│   └── database-subtasks.sql              # Database Subtasks setup
 │
 ├── .gitattributes                        # Git settings for file handling
 ├── .gitignore                            # List of files ignored by Git
