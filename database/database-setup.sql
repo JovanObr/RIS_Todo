@@ -11,9 +11,7 @@ CREATE TABLE IF NOT EXISTS todos (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO todos (title, description, is_completed, due_date) VALUEStodos
+INSERT INTO todos (title, description, is_completed, due_date) VALUES todos
 ('Complete project setup', 'Set up Spring Boot and Node.js environment', FALSE, '2025-10-20 17:00:00'),
 ('Test CRUD operations', 'Verify all Create, Read, Update, Delete operations', FALSE, '2025-10-22 17:00:00'),
 ('Deploy application', 'Deploy to production server', FALSE, '2025-10-25 17:00:00');
-
-select * from todos
