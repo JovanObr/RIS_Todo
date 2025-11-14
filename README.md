@@ -7,6 +7,76 @@ A full-stack web application for managing tasks with hierarchical subtask suppor
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 
+
+---
+
+## Use Case Diagram
+
+The following diagram illustrates all the interactions users can have with the Todo application:
+
+![Use Case Diagram](docs/DPU.png)
+
+### Actors
+
+#### User (Guest):
+
+- Basic todo operations without authentication
+
+#### Registered User:
+
+- All User capabilities plus subtask management
+- Search and filter functionality
+
+#### Admin:
+
+- Full system access including user management
+- View all todos across all users
+- Delete users and access application data
+
+### Use Cases by Actor
+
+#### User Use Cases
+
+- View Todos - Browse all available todos
+- Create Todo - Add new todos with title, description, and due date
+- Update Todo - Modify existing todo information
+- Delete Todo - Remove todos with confirmation dialog
+
+#### Registered User Use Cases
+
+- All User use cases, plus:
+- View Todo Subtasks - Display checklist items for a todo
+- Create Todo Subtask - Add subtask items to break down tasks
+- Toggle Completion - Mark subtasks as complete/incomplete
+- Delete Todo Subtask - Remove individual subtasks with confirmation
+- Search Todos - Find todos by keywords
+- Filter Todos - Filter by status, date, or other criteria
+
+#### Admin Use Cases
+
+- View Registered Users - List all users in the system
+- Delete User - Remove user accounts
+- View All Todos - Access todos from all users
+- View Todos - Browse todos with administrative privileges
+- View App Data - Access system statistics and analytics
+
+### Implementation Status
+
+#### ✅ Currently Implemented:
+
+- Todo CRUD operations (Create, Read, Update, Delete)
+- Subtask management (Create, View, Toggle, Delete)
+- Confirm deletion dialogs
+
+#### 🚧 Planned Features (shown in diagram):
+
+- User authentication and registration
+- Admin role and user management
+- Search functionality
+- Filter functionality
+- Multi-user todo segregation
+- Application analytics dashboard
+
 ---
 
 ## Features
