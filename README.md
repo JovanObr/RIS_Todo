@@ -111,15 +111,6 @@ The following diagram illustrates all the interactions users can have with the T
 - ✅ Foreign key relationships with cascading deletes
 
 ---
-
----
-## Glossary
-
-| Name | Definition | Guidelines | Examples |
-|------|------------|------------|----------|
-| **Todo** | A task or item that needs to be completed | - Should be specific and actionable<br>- Include clear acceptance criteria<br>- Should be assignable to a person or team<br>- Should have a defined priority | - "Design login page mockup"<br>- "Write API documentation for user endpoints"<br>- "Fix bug in payment processing" |
-| **Subtask** | A smaller, more specific task that contributes to completing a larger parent task | - Should be a discrete, manageable piece of work<br>- Should directly relate to and support the parent task<br>- Can be completed independently<br>- Should represent a meaningful step toward parent task completion | - For "Design login page mockup":<br>  • "Create wireframe for login form"<br>  • "Select color scheme and typography"<br>  • "Design error state for invalid credentials" |
----
 ## Architecture
 
 ```
@@ -448,7 +439,10 @@ npm run build
 
 ## Glossary
 
-
+| Name | Definition | Guidelines | Examples |
+|------|------------|------------|----------|
+| **Todo** | A task or item that needs to be completed | - Should be specific and actionable<br>- Include clear acceptance criteria<br>- Should be assignable to a person or team<br>- Should have a defined priority | - "Design login page mockup"<br>- "Write API documentation for user endpoints"<br>- "Fix bug in payment processing" |
+| **Subtask** | A smaller, more specific task that contributes to completing a larger parent task | - Should be a discrete, manageable piece of work<br>- Should directly relate to and support the parent task<br>- Can be completed independently<br>- Should represent a meaningful step toward parent task completion | - For "Design login page mockup":<br>  • "Create wireframe for login form"<br>  • "Select color scheme and typography"<br>  • "Design error state for invalid credentials" |
 
 ---
 
