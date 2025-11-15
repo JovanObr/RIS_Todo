@@ -7,6 +7,11 @@ A full-stack web application for managing tasks with hierarchical subtask suppor
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 
+---
+
+## Vision
+
+
 
 ---
 
@@ -430,6 +435,12 @@ npm run build
 - Check browser console for API errors
 - Verify backend endpoint: `curl http://localhost:8080/api/subtasks/todo/1`
 - Ensure `SubtaskController` has `@CrossOrigin` annotation
+
+---
+
+## Glossary
+
+
 
 ---
 
