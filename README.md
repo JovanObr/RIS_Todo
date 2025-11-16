@@ -11,7 +11,9 @@ A full-stack web application for managing tasks with hierarchical subtask suppor
 
 ## Vision
 
+The aim of this Todo task manager is to give the user an easy and efficient tool to handle all day-to-day tasks in an organized manner. Boosting the productivity levels of the user is one of our core goals, as it is achieved by splitting large and complicated tasks into smaller ones, which are much easier to handle.
 
+Our goal is to develop an interactive interface coupled with efficient back-end functionality to provide a streamlined experience for the users. The users will be able to develop, modify, and manage todos, and those registered on the website will benefit from tools like subtasks, search, and filtering functionality. Registered users will be able to do so, while administrators will have access to advanced system-level management.
 
 ---
 
