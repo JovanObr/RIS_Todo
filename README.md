@@ -450,13 +450,48 @@ npm run build
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
+We welcome contributions from all team members! Please follow the guidelines below to ensure a consistent and collaborative workflow.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Development Workflow (Trunk-Based Development)
+
+This project uses Trunk-Based Development, meaning:
+- All developers commit directly to the main branch
+- Small, frequent commits are encouraged
+- Feature branches may be used temporarily, but must be short-lived and merged quickly
+- Changes should be pushed often to avoid long-running branches and merge conflicts
+
+### Coding Standards
+
+To keep code consistent and easy to read, contributors must follow the standard coding conventions of the language or framework they work in:
+
+#### React Frontend
+
+- Follow official React style guidelines and best practices
+- Use modern ES6+ JavaScript and clean TypeScript patterns
+- Follow commonly accepted React conventions such as:
+- Component-based structure
+- PascalCase for components
+- camelCase for functions and variables
+- Meaningful naming
+- Avoiding unnecessary re-renders
+- Follow project Prettier/ESLint rules (if present)
+
+#### Spring Boot Backend
+
+- Follow standard Java conventions (Oracle Java Style Guide)
+- Follow Spring Boot best practices:
+- Layered architecture (Controller → Service → Repository)
+- Clear naming: *Controller, *Service, *Repository
+- Use dependency injection instead of manual instantiation
+- Consistent formatting, JPA naming conventions, and REST API conventions
+
+### How to Contribute
+
+- Pull the latest changes from main
+- Make your changes in small, focused commits
+- Write clear commit messages
+- Push directly to main (or create a short-lived feature branch if necessary)
+- Open a Pull Request only for larger changes that need review
 
 ---
 
