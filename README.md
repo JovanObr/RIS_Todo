@@ -7,6 +7,13 @@ A full-stack web application for managing tasks with hierarchical subtask suppor
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 
+---
+
+## Vision
+
+The aim of this Todo task manager is to give the user an easy and efficient tool to handle all day-to-day tasks in an organized manner. Boosting the productivity levels of the user is one of our core goals, as it is achieved by splitting large and complicated tasks into smaller ones, which are much easier to handle.
+
+Our goal is to develop an interactive interface coupled with efficient back-end functionality to provide a streamlined experience for the users. The users will be able to develop, modify, and manage todos, and those registered on the website will benefit from tools like subtasks, search, and filtering functionality. Registered users will be able to do so, while administrators will have access to advanced system-level management.
 
 ---
 
@@ -106,7 +113,6 @@ The following diagram illustrates all the interactions users can have with the T
 - ✅ Foreign key relationships with cascading deletes
 
 ---
-
 ## Architecture
 
 ```
@@ -433,15 +439,59 @@ npm run build
 
 ---
 
+## Glossary
+
+| Name | Definition | Guidelines | Examples |
+|------|------------|------------|----------|
+| **Todo** | A task or item that needs to be completed | - Should be specific and actionable<br>- Include clear acceptance criteria<br>- Should be assignable to a person or team<br>- Should have a defined priority | - "Design login page mockup"<br>- "Write API documentation for user endpoints"<br>- "Fix bug in payment processing" |
+| **Subtask** | A smaller, more specific task that contributes to completing a larger parent task | - Should be a discrete, manageable piece of work<br>- Should directly relate to and support the parent task<br>- Can be completed independently<br>- Should represent a meaningful step toward parent task completion | - For "Design login page mockup":<br>  • "Create wireframe for login form"<br>  • "Select color scheme and typography"<br>  • "Design error state for invalid credentials" |
+
+---
+
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
+We welcome contributions from all team members! Please follow the guidelines below to ensure a consistent and collaborative workflow.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Development Workflow (Trunk-Based Development)
+
+This project uses Trunk-Based Development, meaning:
+- All developers commit directly to the main branch
+- Small, frequent commits are encouraged
+- Feature branches may be used temporarily, but must be short-lived and merged quickly
+- Changes should be pushed often to avoid long-running branches and merge conflicts
+
+### Coding Standards
+
+To keep code consistent and easy to read, contributors must follow the standard coding conventions of the language or framework they work in:
+
+#### React Frontend
+
+- Follow official React style guidelines and best practices
+- Use modern ES6+ JavaScript and clean TypeScript patterns
+- Follow commonly accepted React conventions such as:
+- Component-based structure
+- PascalCase for components
+- camelCase for functions and variables
+- Meaningful naming
+- Avoiding unnecessary re-renders
+- Follow project Prettier/ESLint rules (if present)
+
+#### Spring Boot Backend
+
+- Follow standard Java conventions (Oracle Java Style Guide)
+- Follow Spring Boot best practices:
+- Layered architecture (Controller → Service → Repository)
+- Clear naming: *Controller, *Service, *Repository
+- Use dependency injection instead of manual instantiation
+- Consistent formatting, JPA naming conventions, and REST API conventions
+
+### How to Contribute
+
+- Pull the latest changes from main
+- Make your changes in small, focused commits
+- Write clear commit messages
+- Push directly to main (or create a short-lived feature branch if necessary)
+- Open a Pull Request only for larger changes that need review
 
 ---
 
