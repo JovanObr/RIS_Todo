@@ -441,10 +441,18 @@ npm run build
 
 ## Glossary
 
-| Name | Definition | Guidelines | Examples |
-|------|------------|------------|----------|
-| **Todo** | A task or item that needs to be completed | - Should be specific and actionable<br>- Include clear acceptance criteria<br>- Should be assignable to a person or team<br>- Should have a defined priority | - "Design login page mockup"<br>- "Write API documentation for user endpoints"<br>- "Fix bug in payment processing" |
-| **Subtask** | A smaller, more specific task that contributes to completing a larger parent task | - Should be a discrete, manageable piece of work<br>- Should directly relate to and support the parent task<br>- Can be completed independently<br>- Should represent a meaningful step toward parent task completion | - For "Design login page mockup":<br>  • "Create wireframe for login form"<br>  • "Select color scheme and typography"<br>  • "Design error state for invalid credentials" |
+| Term | Definition | Why It Matters |
+|------|------------|----------------|
+| **Todo** | A user-created task with a title, description, status, and optional due date. | Core object of the system; everything revolves around creating and managing Todos. |
+| **Subtask** | A smaller actionable item linked to a Todo. | Enables users to break down complex tasks and track detailed progress. |
+| **Completion Status** | Indicates whether a Todo or Subtask is finished (`true`/`false`). | Used in progress tracking, UI indicators, and filtering/search features. |
+| **Progress Bar** | A visual indicator showing the percentage of completed subtasks within a Todo. | Helps users quickly assess progress on larger tasks. |
+| **Due Date** | An optional timestamp representing the deadline for a Todo. | Supports sorting, prioritization, and future reminders. |
+| **Registered User** | A user with an account and additional privileges such as subtasks, filtering, and search. | Unlocks advanced functionality and personalized task management. |
+| **Admin** | A privileged user role with full access to system data, user management, and global Todos. | Ensures system maintenance, cleanup, and administrative oversight. |
+| **Search** | Functionality to look up Todos by matching keywords. | Helps users quickly locate tasks in larger lists. |
+| **Filtering** | Ability to narrow Todos by attributes such as completion status, due date, or keywords. | Improves usability and helps users focus on specific categories of tasks. |
+| **CRUD** | Create, Read, Update, Delete operations performed on Todos and Subtasks. | Describes the fundamental backend and frontend interactions within the application. |
 
 ---
 
