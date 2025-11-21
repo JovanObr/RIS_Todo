@@ -13,22 +13,29 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository;
 
-    // CREATE
+    // CREATE - Add a new todo
     public Todo createTodo(Todo todo) {
         return todoRepository.save(todo);
     }
 
-    // READ
+    // READ - Get all todos
     public List<Todo> getAllTodos() {
         return todoRepository.findAll();
     }
 
-    // READ
+    // READ - Get todos by user ID
+    public List<Todo> getTodosByUserId(Integer userId) {
+        return todoRepository.findAll().stream()
+                .filter(todo -> todo.getUser() != null && todo.getUser().getId().equals(userId))
+                .toList();
+    }
+
+    // READ - Get a single todo by id
     public Optional<Todo> getTodoById(Integer id) {
         return todoRepository.findById(id);
     }
 
-    // UPDATE
+    // UPDATE - Update an existing todo
     public Todo updateTodo(Integer id, Todo todoDetails) {
         Optional<Todo> optionalTodo = todoRepository.findById(id);
 
@@ -54,7 +61,7 @@ public class TodoService {
         return null;
     }
 
-    // DELETE
+    // DELETE - Delete a todo by id
     public boolean deleteTodo(Integer id) {
         if (todoRepository.existsById(id)) {
             todoRepository.deleteById(id);
