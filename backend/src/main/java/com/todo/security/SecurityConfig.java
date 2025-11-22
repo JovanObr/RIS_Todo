@@ -61,12 +61,15 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
+                        // Guest mode endpoints (allow anonymous)
+                        .requestMatchers("/todos/**", "/subtasks/**").permitAll()
+
                         // Admin-only endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
 
                         // Authenticated endpoints
-                        .requestMatchers("/todos/**", "/subtasks/**").authenticated()
+                        .requestMatchers("/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

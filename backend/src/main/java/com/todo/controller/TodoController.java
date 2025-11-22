@@ -24,13 +24,17 @@ public class TodoController {
     @Autowired
     private UserService userService;
 
-    // CREATE - POST endpoint to add a new todo
+    // CREATE - POST endpoint (works for both guest and authenticated users)
     @PostMapping
     public ResponseEntity<?> createTodo(@RequestBody Todo todo, Authentication authentication) {
+        // Guest mode - return the todo without saving to database
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            // Generate temporary ID (negative to distinguish from DB IDs)
+            todo.setId(-(int)(System.currentTimeMillis() % 100000));
+            return new ResponseEntity<>(todo, HttpStatus.CREATED);
         }
 
+        // Authenticated user - save to database
         String username = authentication.getName();
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -40,11 +44,12 @@ public class TodoController {
         return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
     }
 
-    // READ - GET all todos for current user
+    // READ - GET all todos (only for authenticated users)
     @GetMapping
     public ResponseEntity<?> getAllTodos(Authentication authentication) {
+        // Guest mode - return empty list (frontend handles this)
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            return ResponseEntity.ok(List.of());
         }
 
         String username = authentication.getName();
@@ -55,11 +60,12 @@ public class TodoController {
         return new ResponseEntity<>(todos, HttpStatus.OK);
     }
 
-    // READ - GET a single todo by id (only if it belongs to current user)
+    // READ - GET single todo
     @GetMapping("/{id}")
     public ResponseEntity<?> getTodoById(@PathVariable Integer id, Authentication authentication) {
+        // Guest mode - frontend handles in-memory todos
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            return ResponseEntity.ok().build();
         }
 
         String username = authentication.getName();
@@ -72,7 +78,6 @@ public class TodoController {
             return ResponseEntity.notFound().build();
         }
 
-        // Check if todo belongs to current user
         if (todo.get().getUser() == null || !todo.get().getUser().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
         }
@@ -80,13 +85,15 @@ public class TodoController {
         return new ResponseEntity<>(todo.get(), HttpStatus.OK);
     }
 
-    // UPDATE - PUT endpoint to update a todo
+    // UPDATE - PUT endpoint
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTodo(@PathVariable Integer id,
                                         @RequestBody Todo todoDetails,
                                         Authentication authentication) {
+        // Guest mode - return updated todo without saving
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            todoDetails.setId(id);
+            return new ResponseEntity<>(todoDetails, HttpStatus.OK);
         }
 
         String username = authentication.getName();
@@ -99,7 +106,6 @@ public class TodoController {
             return ResponseEntity.notFound().build();
         }
 
-        // Check if todo belongs to current user
         if (existingTodo.get().getUser() == null ||
                 !existingTodo.get().getUser().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
@@ -113,11 +119,12 @@ public class TodoController {
         }
     }
 
-    // DELETE - DELETE endpoint to remove a todo
+    // DELETE - DELETE endpoint
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTodo(@PathVariable Integer id, Authentication authentication) {
+        // Guest mode - return success (frontend handles deletion)
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         String username = authentication.getName();
@@ -130,7 +137,6 @@ public class TodoController {
             return ResponseEntity.notFound().build();
         }
 
-        // Check if todo belongs to current user
         if (existingTodo.get().getUser() == null ||
                 !existingTodo.get().getUser().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
