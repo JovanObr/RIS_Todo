@@ -1,0 +1,382 @@
+.admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+.admin-modal {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 1200px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.admin-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.admin-modal-close:hover {
+    color: #333;
+    transform: rotate(90deg);
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-header h2 {
+    color: #333;
+    font-size: 2.2em;
+    margin-bottom: 10px;
+}
+
+.admin-header p {
+    color: #666;
+    font-size: 1em;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+    overflow-x: auto;
+}
+
+.admin-tab {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.admin-tab:hover {
+    color: #667eea;
+}
+
+.admin-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.admin-content {
+    min-height: 400px;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    padding: 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 3em;
+}
+
+.stat-info h3 {
+    font-size: 2.5em;
+    margin: 0;
+    font-weight: 700;
+}
+
+.stat-info p {
+    font-size: 1.1em;
+    margin: 5px 0;
+    font-weight: 600;
+}
+
+.stat-info small {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.stat-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stat-success {
+    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+    color: white;
+}
+
+.stat-warning {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+}
+
+.stat-danger {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+}
+
+.stat-info {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+}
+
+/* Activity List */
+.activity-list h3,
+.todos-management h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.activity-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s;
+}
+
+.activity-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.activity-icon {
+    font-size: 2em;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-details h4 {
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.activity-details p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 3px 0;
+}
+
+.activity-desc {
+    color: #777;
+    font-style: italic;
+}
+
+.activity-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-completed {
+    background: #4CAF50;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #ff9800;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* Todos Management */
+.admin-todos-list {
+    display: grid;
+    gap: 15px;
+}
+
+.admin-todo-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.admin-todo-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+}
+
+.admin-todo-card.completed {
+    background: #f5f5f5;
+    opacity: 0.8;
+}
+
+.admin-todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.admin-todo-header h4 {
+    color: #333;
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.admin-delete-btn {
+    padding: 8px 16px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.admin-delete-btn:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+}
+
+.admin-todo-desc {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.admin-todo-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.admin-todo-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-todo-dates {
+    display: flex;
+    gap: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 10px;
+}
+
+.admin-todo-dates small {
+    color: #999;
+    font-size: 0.85em;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 1.1em;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 60px;
+    font-size: 1.2em;
+    color: #667eea;
+}
+
+@media (max-width: 768px) {
+    .admin-modal {
+        padding: 20px;
+        width: 98%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-tabs {
+        gap: 5px;
+    }
+
+    .admin-tab {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-todo-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .admin-delete-btn {
+        width: 100%;
+    }
+}

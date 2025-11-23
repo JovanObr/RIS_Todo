@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/todos")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class TodoController {
 
     @Autowired

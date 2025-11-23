@@ -1,6 +1,7 @@
 HELP.md
 target/
 backend/.mvn/wrapper/maven-wrapper.jar
+backend/src/main/resources/application.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
 frontend/node_modules
