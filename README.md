@@ -25,6 +25,8 @@ The following diagram illustrates all the interactions users can have with the T
 
 ![Use Case Diagram](docs/DPU.png)
 
+![Use Case Descriptions](docs/DetailedUseCaseDescriptions.docx)
+
 ### Actors
 
 #### User (Guest):
