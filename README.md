@@ -25,7 +25,7 @@ The following diagram illustrates all the interactions users can have with the T
 
 ![Use Case Diagram](docs/DPU.png)
 
-![Use Case Descriptions](docs/DetailedUseCaseDescriptions.docx)
+![Use Case Descriptions](docs/README.md)
 
 ### Actors
 
@@ -109,6 +109,45 @@ The following diagram illustrates all the interactions users can have with the T
 - Search functionality (UI implementation)
 - Filter functionality (UI implementation)
 
+---
+
+## Class Diagram
+
+![Class Diagram](docs/ClassDiagramRIS.png)
+
+### Class Diagram Description
+
+The Domain Class Diagram represents the core business model of the Todo Application. It focuses only on the essential entities, their attributes, and the relationships between them, without involving controllers, services, repositories, or technical implementation details.
+
+At the center of the domain are three main entities:
+
+#### User
+
+A user of the system.
+Each user owns a personal collection of todos and has an assigned Role (USER or ADMIN).
+Users authenticate into the system and manage their tasks.
+
+#### Todo
+
+A task created by a user.
+Each todo contains a title, description, completion status, timestamps, and a list of its subtasks.
+Todos belong to exactly one user, forming a one-to-many relationship.
+
+#### Subtask
+
+A smaller, actionable item that belongs to a todo.
+Each subtask has its own title and completion flag and is always associated with exactly one parent todo.
+
+#### Relationships
+
+- User 1 → * Todo
+  (A user can create and own many todos.)
+
+- Todo 1 → * Subtask
+(Each todo can have multiple subtasks.)
+
+- User → Role (enum)
+(A user is assigned exactly one role.)
 ---
 
 ## Features
