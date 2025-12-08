@@ -43,10 +43,8 @@ public class TodoController {
         return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
     }
 
-    // READ - GET all todos (only for authenticated users)
     @GetMapping
-    public ResponseEntity<?> getAllTodos(Authentication authentication) {
-        // Guest mode - return empty list (frontend handles this)
+    public ResponseEntity<?> getAllTodos(Authentication authentication, @RequestParam(required = false) String name) {
         if (authentication == null) {
             return ResponseEntity.ok(List.of());
         }
@@ -55,7 +53,7 @@ public class TodoController {
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Todo> todos = todoService.getTodosByUserId(user.getId());
+        List<Todo> todos = todoService.getTodosByUserId(user.getId(), name);
         return new ResponseEntity<>(todos, HttpStatus.OK);
     }
 

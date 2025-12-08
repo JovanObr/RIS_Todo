@@ -21,6 +21,11 @@ function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
     const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(''); 
+    const [isSearching, setIsSearching] = useState(false); 
+    const [originalTodos, setOriginalTodos] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState('');
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -32,15 +37,15 @@ function App() {
         if (isAuthenticated) {
             fetchAllTodos();
         } else {
-            // Load todos from sessionStorage for guest users
             const guestTodos = sessionStorage.getItem('guestTodos');
             if (guestTodos) {
-                setTodos(JSON.parse(guestTodos));
+                const parsedTodos = JSON.parse(guestTodos);
+                setTodos(parsedTodos);
+                setOriginalTodos(parsedTodos); 
             }
         }
     }, [isAuthenticated]);
 
-    // Save guest todos to sessionStorage whenever they change
     useEffect(() => {
         if (!isAuthenticated && todos.length > 0) {
             sessionStorage.setItem('guestTodos', JSON.stringify(todos));
@@ -52,6 +57,10 @@ function App() {
             setLoading(true);
             const response = await axios.get(API_URL);
             setTodos(response.data);
+            setOriginalTodos(response.data); 
+            setIsSearching(false); 
+            setSearchTerm(''); 
+            setSearchError(''); 
         } catch (error) {
             console.error('Error fetching todos:', error);
             if (isAuthenticated) {
@@ -62,8 +71,55 @@ function App() {
         }
     };
 
+    const handleSearch = async () => {
+        if (!searchTerm.trim()) {
+            alert('Please enter a search term');
+            return;
+        }
+
+        try {
+            setSearchLoading(true);
+            setSearchError('');
+            
+            if (isAuthenticated) {
+                const response = await axios.get(`${API_URL}?name=${encodeURIComponent(searchTerm.trim())}`);
+                setTodos(response.data);
+                setIsSearching(true);
+            } else {
+                const filtered = originalTodos.filter(todo =>
+                    todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (todo.description && todo.description.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+                setTodos(filtered);
+                setIsSearching(true);
+            }
+        } catch (error) {
+            console.error('Error searching todos:', error);
+            setSearchError('Failed to search todos. Please try again.');
+            alert('Failed to search todos');
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    const handleResetSearch = () => {
+        if (isAuthenticated) {
+            fetchAllTodos();
+        } else {
+            setTodos(originalTodos);
+            setIsSearching(false);
+            setSearchTerm('');
+            setSearchError('');
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     const fetchTodoById = async (id) => {
-        // For guest users, find in local state
         if (!isAuthenticated) {
             const todo = todos.find(t => t.id === id);
             if (todo) {
@@ -204,12 +260,19 @@ function App() {
 
             if (isAuthenticated) {
                 const response = await axios.post(API_URL, newTodo);
-                setTodos([...todos, response.data]);
+                const updatedTodos = [...todos, response.data];
+                setTodos(updatedTodos);
+                if (!isSearching) {
+                    setOriginalTodos(updatedTodos);
+                }
             } else {
-                // Guest mode - add to local state
                 newTodo.id = Date.now();
                 newTodo.createdAt = new Date().toISOString();
-                setTodos([...todos, newTodo]);
+                const updatedTodos = [...todos, newTodo];
+                setTodos(updatedTodos);
+                if (!isSearching) {
+                    setOriginalTodos(updatedTodos);
+                }
             }
 
             resetForm();
@@ -236,14 +299,22 @@ function App() {
 
             if (isAuthenticated) {
                 const response = await axios.put(`${API_URL}/${editingId}`, updatedTodo);
-                setTodos(todos.map(todo =>
+                const updatedTodos = todos.map(todo =>
                     todo.id === editingId ? response.data : todo
-                ));
+                );
+                setTodos(updatedTodos);
+                if (!isSearching) {
+                    setOriginalTodos(updatedTodos);
+                }
             } else {
                 // Guest mode - update in local state
-                setTodos(todos.map(todo =>
+                const updatedTodos = todos.map(todo =>
                     todo.id === editingId ? { ...todo, ...updatedTodo } : todo
-                ));
+                );
+                setTodos(updatedTodos);
+                if (!isSearching) {
+                    setOriginalTodos(updatedTodos);
+                }
             }
 
             resetForm();
@@ -260,7 +331,11 @@ function App() {
                 if (isAuthenticated) {
                     await axios.delete(`${API_URL}/${id}`);
                 }
-                setTodos(todos.filter(todo => todo.id !== id));
+                const updatedTodos = todos.filter(todo => todo.id !== id);
+                setTodos(updatedTodos);
+                if (!isSearching) {
+                    setOriginalTodos(updatedTodos);
+                }
                 alert('Todo deleted successfully!');
             } catch (error) {
                 console.error('Error deleting todo:', error);
@@ -384,11 +459,62 @@ function App() {
                     {/* Todos List Section */}
                     <section className="todos-section">
                         <h2>Your Todos</h2>
+                        
+                        {/* Search Bar Section */}
+                        <div className="search-section">
+                            <div className="search-input-group">
+                                <input
+                                    type="text"
+                                    placeholder="Search todos by title or description..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    className="search-input"
+                                />
+                                <button
+                                    className="btn btn-search"
+                                    onClick={handleSearch}
+                                    disabled={searchLoading}
+                                >
+                                    {searchLoading ? 'Searching...' : '🔍 Search'}
+                                </button>
+                                {isSearching && (
+                                    <button
+                                        className="btn btn-reset"
+                                        onClick={handleResetSearch}
+                                    >
+                                        Show All
+                                    </button>
+                                )}
+                            </div>
+                            {searchError && (
+                                <p className="search-error">{searchError}</p>
+                            )}
+                            {isSearching && (
+                                <p className="search-info">
+                                    Showing {todos.length} result{todos.length !== 1 ? 's' : ''} for "{searchTerm}"
+                                </p>
+                            )}
+                        </div>
 
                         {loading ? (
                             <p className="loading">Loading todos...</p>
                         ) : todos.length === 0 ? (
-                            <p className="empty">No todos yet. Add one to get started!</p>
+                            <div className="empty">
+                                {isSearching ? (
+                                    <>
+                                        <p>No todos found for "{searchTerm}"</p>
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={handleResetSearch}
+                                        >
+                                            Show All Todos
+                                        </button>
+                                    </>
+                                ) : (
+                                    <p>No todos yet. Add one to get started!</p>
+                                )}
+                            </div>
                         ) : (
                             <div className="todos-list">
                                 {todos.map(todo => {

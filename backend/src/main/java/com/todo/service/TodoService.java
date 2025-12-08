@@ -24,10 +24,12 @@ public class TodoService {
     }
 
     // READ - Get todos by user ID
-    public List<Todo> getTodosByUserId(Integer userId) {
-        return todoRepository.findAll().stream()
-                .filter(todo -> todo.getUser() != null && todo.getUser().getId().equals(userId))
-                .toList();
+    public List<Todo> getTodosByUserId(Integer userId, String name) {
+        if(name == null || name.isEmpty()) {
+            return todoRepository.findTodosByUserIdIs(userId);
+        }else{
+            return todoRepository.findTodosByTitleContainingIgnoreCaseAndUserIdIs(name, userId);
+        }
     }
 
     // READ - Get a single todo by id
