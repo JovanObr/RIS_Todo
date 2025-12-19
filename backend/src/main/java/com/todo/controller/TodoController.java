@@ -18,10 +18,10 @@ import java.util.Optional;
 public class TodoController {
 
     @Autowired
-    private TodoService todoService;
+     TodoService todoService;
 
     @Autowired
-    private UserService userService;
+     UserService userService;
 
     // CREATE - POST endpoint (works for both guest and authenticated users)
     @PostMapping
