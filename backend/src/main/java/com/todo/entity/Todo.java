@@ -44,7 +44,7 @@ public class Todo {
     @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Attachment> attachments = new ArrayList<>();
 
