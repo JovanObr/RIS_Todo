@@ -1,5 +1,7 @@
 package com.todo.dto;
 
+import com.todo.entity.Role;
+import com.todo.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,4 +18,18 @@ public class UserDTO {
     private Boolean isActive;
     private LocalDateTime createdAt;
     private Integer todoCount;
+
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.email = user.getEmail();
+        if (user.getRole() == Role.USER) {
+            this.role = "USER";
+        }else {
+            this.role = "ADMIN";
+        }
+
+        this.createdAt = user.getCreatedAt();
+        this.todoCount = user.getTodos().size();
+    }
 }

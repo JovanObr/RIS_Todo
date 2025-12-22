@@ -1,5 +1,6 @@
 package com.todo.controller;
 
+import com.todo.dto.AttachmentDTO;
 import com.todo.entity.Attachment;
 import com.todo.entity.User;
 import com.todo.service.AttachmentService;
@@ -40,7 +41,7 @@ public class AttachmentController {
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Attachment attachment =
+        AttachmentDTO attachment =
                 attachmentService.createAttachment(todoId, file, user.getId());
 
         return new ResponseEntity<>(attachment, HttpStatus.CREATED);
@@ -50,7 +51,7 @@ public class AttachmentController {
      * Get all attachments for a todo
      */
     @GetMapping("/todo/{todoId}")
-    public ResponseEntity<List<Attachment>> getAttachments(@PathVariable Integer todoId) {
+    public ResponseEntity<List<AttachmentDTO>> getAttachments(@PathVariable Integer todoId) {
         return ResponseEntity.ok(
                 attachmentService.getAttachmentsByTodoId(todoId)
         );

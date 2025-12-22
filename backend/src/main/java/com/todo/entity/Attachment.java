@@ -37,6 +37,9 @@ public class Attachment {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "download_url", nullable = false)
+    private String downloadURL;
+
     // Many attachments belong to one todo
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "todo_id", nullable = false)
@@ -50,12 +53,13 @@ public class Attachment {
 
     // Constructor without ID and createdAt (for creating new attachments)
     public Attachment(String fileName, String filePath, Long fileSize,
-                      String fileType, Integer uploadedBy, Todo todo) {
+                      String fileType, Integer uploadedBy, Todo todo, String downloadURL) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.fileSize = fileSize;
         this.fileType = fileType;
         this.uploadedBy = uploadedBy;
         this.todo = todo;
+        this.downloadURL = downloadURL;
     }
 }

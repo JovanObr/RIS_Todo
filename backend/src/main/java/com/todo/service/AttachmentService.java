@@ -1,5 +1,7 @@
 package com.todo.service;
 
+import com.todo.dto.AttachmentDTO;
+import com.todo.dto.UserDTO;
 import com.todo.entity.Attachment;
 import com.todo.entity.Todo;
 import com.todo.entity.User;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -33,7 +37,7 @@ public class AttachmentService {
     /**
      * CREATE attachment
      */
-    public Attachment createAttachment(Integer todoId, MultipartFile file, Integer userId) {
+    public AttachmentDTO createAttachment(Integer todoId, MultipartFile file, Integer userId) {
         try {
             Todo todo = todoRepository.findById(todoId)
                     .orElseThrow(() -> new RuntimeException("Todo not found"));
@@ -49,16 +53,28 @@ public class AttachmentService {
             // Store file
             String storedFileName = fileStorageService.uploadFile(file);
 
+
+            //This is temporary, will be replaced with url being returned from bucket API
+            String url = UUID.randomUUID().toString().replace("-", "");
+
+            UserDTO userDTO = new UserDTO(user);
+
+
             Attachment attachment = new Attachment(
                     file.getOriginalFilename(),
                     storedFileName,
                     file.getSize(),
                     file.getContentType(),
                     user.getId(),
-                    todo
+                    todo,
+                    url
             );
 
-            return attachmentRepository.save(attachment);
+            AttachmentDTO attachmentDTO = new AttachmentDTO(attachment, userDTO);
+
+            attachmentRepository.save(attachment);
+
+            return attachmentDTO;
 
         } catch (IOException ex) {
             log.error("Failed to upload attachment", ex);
@@ -69,8 +85,17 @@ public class AttachmentService {
     /**
      * READ attachments by todo
      */
-    public List<Attachment> getAttachmentsByTodoId(Integer todoId) {
-        return attachmentRepository.findByTodo_IdOrderByCreatedAtDesc(todoId);
+    public List<AttachmentDTO> getAttachmentsByTodoId(Integer todoId) {
+        List<Attachment> attachments = attachmentRepository.findByTodo_IdOrderByCreatedAtDesc(todoId);
+
+        List<AttachmentDTO> attachmentDTOS = new ArrayList<>();
+        attachments.forEach(attachment -> {
+            UserDTO userDTO = new UserDTO();
+            AttachmentDTO attachmentDTO = new AttachmentDTO(attachment, userDTO);
+            attachmentDTOS.add(attachmentDTO);
+        });
+
+        return attachmentDTOS;
     }
 
     /**
