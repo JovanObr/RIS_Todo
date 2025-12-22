@@ -103,11 +103,12 @@ The following diagram illustrates all the interactions users can have with the T
 - **Application analytics dashboard**
 - **Guest mode with temporary storage**
 - **Secure API endpoints with authentication**
-
-#### 🚧 Planned Features:
-
-- Search functionality (UI implementation)
-- Filter functionality (UI implementation)
+- **File Attachments - Upload images and documents to todos**
+  - Image support (JPG, PNG, GIF)
+  - Document support (PDF, DOCX, TXT)
+  - File size limit (10MB max)
+  - Download and delete attachments
+  - Multiple attachments per todo
 
 ---
 
@@ -191,6 +192,25 @@ Each subtask has its own title and completion flag and is always associated with
 - **Recent Activity** - Monitor latest todo creation
 - **Admin Todo Management** - Delete any todo
 
+### File Attachments
+
+- Upload Files - Attach images and documents to any todo
+- Supported File Types:
+  - Images: JPG, PNG, GIF
+  - Documents: PDF, DOCX, TXT
+- File Management:
+  - Upload multiple files per todo
+  - Download attachments
+  - Delete attachments (with ownership check)
+  - View file size and type
+- Security:
+  - File size validation (10MB maximum)
+  - File type validation 
+  - Unique filenames to prevent collisions 
+  - User ownership verification
+- Storage: Local file system storage in uploads/ directory
+- Automatic Cleanup: Attachments deleted when parent todo deleted (CASCADE)
+
 ### Technical Features
 - RESTful API architecture
 - JWT-based stateless authentication
@@ -237,8 +257,9 @@ Each subtask has its own title and completion flag and is always associated with
 
 **Database:**
 - MySQL 8.0
-- Three tables: `users`, `todos`, `subtasks`
+- Three tables: `users`, `todos`, `subtasks`, `attachments` 
 - Foreign key relationships with cascading deletes
+- File metadata storage with blob references
 
 **Security:**
 - JWT-based authentication
@@ -261,21 +282,25 @@ Todo/
 │   │   │   ├── UserController.java             # User management endpoints
 │   │   │   ├── AdminController.java            # Admin-only endpoints
 │   │   │   ├── TodoController.java             # REST endpoints for todos
-│   │   │   └── SubtaskController.java          # REST endpoints for subtasks
+│   │   │   ├── SubtaskController.java          # REST endpoints for subtasks
+│   │   │   └── AttachmentController.java       # REST endpoints for attachments
 │   │   ├── dto/
 │   │   │   ├── LoginRequest.java               # Login request DTO
 │   │   │   ├── RegisterRequest.java            # Registration request DTO
 │   │   │   ├── AuthResponse.java               # Auth response with JWT
-│   │   │   └── UserDTO.java                    # User data transfer object
+│   │   │   ├── UserDTO.java                    # User data transfer object
+│   │   │   └── AttachmentDTO.java              # Attachment data transfer object
 │   │   ├── entity/
 │   │   │   ├── User.java                       # User entity model
 │   │   │   ├── Role.java                       # Role enum (USER, ADMIN)
-│   │   │   ├── Todo.java                       # Todo entity model
-│   │   │   └── Subtask.java                    # Subtask entity model
+│   │   │   ├── Todo.java                       # Todo entity model (with attachments)
+│   │   │   ├── Subtask.java                    # Subtask entity model
+│   │   │   └── Attachment.java                 # Attachment entity model
 │   │   ├── repository/
 │   │   │   ├── UserRepository.java             # User database access
 │   │   │   ├── TodoRepository.java             # Todo database access
-│   │   │   └── SubtaskRepository.java          # Subtask database access
+│   │   │   ├── SubtaskRepository.java          # Subtask database access
+│   │   │   └── AttachmentRepository.java       # Attachment database access
 │   │   ├── security/
 │   │   │   ├── SecurityConfig.java             # Spring Security configuration
 │   │   │   ├── JwtUtil.java                    # JWT token utilities
@@ -285,7 +310,9 @@ Todo/
 │   │       ├── AuthService.java                # Authentication business logic
 │   │       ├── UserService.java                # User management logic
 │   │       ├── TodoService.java                # Todo business logic
-│   │       └── SubtaskService.java             # Subtask business logic
+│   │       ├── SubtaskService.java             # Subtask business logic
+│   │       ├── AttachmentService.java          # Attachment business logic
+│   │       └── FileStorageService.java         # File upload/download/delete
 │   ├── src/main/resources/
 │   │   └── application.properties              # Database & JWT config
 │   └── pom.xml                                 # Maven dependencies
@@ -302,10 +329,11 @@ Todo/
 │   │   │   ├── Navbar.css                      # Navbar styling
 │   │   │   └── Navbar.jsx                      # Navbar component
 │   │   ├── services/
-│   │   │   └── authService.js                  # Authentication API calls
+│   │   │   ├── authService.js                  # Authentication API calls
+│   │   │   └── attachmentService.js            # Attachment API calls
 │   │   ├── context/
 │   │   │   └── authContext.jsx                 # Authentication context
-│   │   ├── App.jsx                             # Main React component
+│   │   ├── App.jsx                             # Main React component (with attachments)
 │   │   ├── App.css                             # Application styles
 │   │   ├── index.css                           # Index styles
 │   │   └── main.jsx                            # React entry point
@@ -316,7 +344,10 @@ Todo/
 ├── database/
 │   ├── database-setup.sql                # Initial database setup
 │   ├── database-users.sql                # Users table setup
-│   └── database-subtasks.sql             # Subtasks table setup
+│   ├── database-subtasks.sql             # Subtasks table setup
+│   └── database-attachments.sql          # Attachments table setup
+│
+├── uploads/                              # File storage directory (gitignored)
 │
 ├── docs/
 │   ├── DetailedUseCaseDescriptions.docx
@@ -432,6 +463,7 @@ Frontend will open at `http://localhost:5173`
 - ❌ No subtask support
 - ❌ No data persistence
 - ❌ Data lost on page refresh/close
+- ❌ File Attachment Access
 
 **Use Case:** Try the application before registering
 
@@ -446,7 +478,8 @@ Frontend will open at `http://localhost:5173`
 - ✅ Create/manage subtasks for own todos
 - ✅ View progress bars and statistics
 - ✅ Access from any device
-- ✅ Search and filter (when implemented)
+- ✅ Search and filter
+- ✅ File Attachment Access
 - ❌ Cannot view other users' todos
 - ❌ Cannot access admin features
 
@@ -540,6 +573,19 @@ Frontend will open at `http://localhost:5173`
 | GET | `/api/admin/stats` | Get app statistics | Yes | ADMIN |
 | GET | `/api/admin/activity/recent` | Get recent activity | Yes | ADMIN |
 | DELETE | `/api/admin/todos/{id}` | Delete any todo | Yes | ADMIN |
+
+
+### Attachment Endpoints
+
+| Method | Endpoint | Description             | Auth Required | Notes                         |
+|--------|----------|-------------------------|---------------|-------------------------------|
+| POST   | `/api/todos/{todoId}/attachments` | Upload file             | Yes           | Only if todo is owned by user |
+| GET    | `/api/todos/{todoId}/attachments` | List attachments        | Yes           | Only if todo is owned by user |
+| GET    | `/api/attachments/{id}` | Get attachment metadata | Yes           | Only if parent todo is owned  |
+| GET    | `/api/attachments/{id}/download` | Download file           | Yes           | Only if parent todo is owned  |
+| DELETE | `/api/attachments/{id}` | Delete attachment       | Yes           | Only if parent todo is owned  |
+| GET    | `/api/attachments/count/{todoId}` | Get attachment count    | Yes           | Only if parent todo is owned  |
+
 
 ---
 
@@ -703,12 +749,29 @@ curl -X GET http://localhost:8080/api/admin/stats \
 | position | INT | Display order |
 | created_at | TIMESTAMP | Creation timestamp |
 
+### `attachments` Table
+
+| Column      | Type         | Description          |
+|-------------|--------------|----------------------|
+| id          | INT (PK, AI) | Unique identifier    |
+| todo_id     | INT(FK)      | Parent todo ID       |
+| file_name   | VARCHAR(255) | Original filename    |
+| file_path   | VARCHAR(500) | Storage path         |
+| file_size   | BIGINT       | File size in bytes   |
+| file_type   | VARCHAR(50)  | MIME type            |
+| uploaded_by | INT(FK)      | User ID who uploaded |
+| created_at  | TIMESTAMP    | Upload timestamp     |
+
 ### Relationships
 
 - **User → Todos**: One-to-Many (One user has many todos)
     - `ON DELETE CASCADE` - Deleting user deletes all their todos
 - **Todo → Subtasks**: One-to-Many (One todo has many subtasks)
     - `ON DELETE CASCADE` - Deleting todo deletes all its subtasks
+- **Todo → Attachments: One-to-Many (One todo has many attachments)**
+    - `ON DELETE CASCADE` - Deleting todo deletes all its attachments and files
+- **User → Attachments: One-to-Many (Tracks who uploaded each file)**
+    - `ON DELETE CASCADE` - Deleting user deletes all their uploaded files
 
 ---
 
