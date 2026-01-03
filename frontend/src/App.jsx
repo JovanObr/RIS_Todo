@@ -5,10 +5,14 @@ import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal';
 import GuestWarning from './components/GuestWarning';
 import AdminDashboard from './components/AdminDashboard';
+import AttachmentUpload from './components/AttachmentUpload';
+import AttachmentList from './components/AttachmentList';
+import authService from './services/authService';
 import './App.css';
 
 const API_URL = 'http://localhost:8080/api/todos';
 const SUBTASK_API_URL = 'http://localhost:8080/api/subtasks';
+const ATTACHMENT_API_URL = 'http://localhost:8080/api/attachments';
 
 function App() {
     const { isAuthenticated } = useAuth();
@@ -17,6 +21,7 @@ function App() {
     const [editingId, setEditingId] = useState(null);
     const [expandedTodoId, setExpandedTodoId] = useState(null);
     const [subtasks, setSubtasks] = useState({});
+    const [attachments, setAttachments] = useState({});
     const [newSubtaskText, setNewSubtaskText] = useState({});
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
@@ -26,12 +31,54 @@ function App() {
     const [originalTodos, setOriginalTodos] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState('');
+    const [expandedSections, setExpandedSections] = useState({});
+    const [uploadingAttachment, setUploadingAttachment] = useState({});
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         isCompleted: false,
         dueDate: ''
     });
+
+    // Helper function to make API calls with auth headers
+    const apiCall = async (method, url, data = null, config = {}) => {
+        const token = authService.getToken();
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            ...config.headers
+        };
+
+        try {
+            const response = await axios({
+                method,
+                url,
+                data,
+                headers
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`API Error (${method} ${url}):`, error);
+            throw error;
+        }
+    };
+
+    // Helper function for file uploads
+    const apiUpload = async (url, formData) => {
+        const token = authService.getToken();
+        
+        try {
+            const response = await axios.post(url, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`Upload Error (${url}):`, error);
+            throw error;
+        }
+    };
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -55,9 +102,17 @@ function App() {
     const fetchAllTodos = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(API_URL);
-            setTodos(response.data);
-            setOriginalTodos(response.data); 
+            let response;
+            
+            if (isAuthenticated) {
+                response = await apiCall('get', API_URL);
+            } else {
+                // Guest mode - no auth header needed
+                response = await axios.get(API_URL);
+            }
+            
+            setTodos(response);
+            setOriginalTodos(response); 
             setIsSearching(false); 
             setSearchTerm(''); 
             setSearchError(''); 
@@ -82,8 +137,8 @@ function App() {
             setSearchError('');
             
             if (isAuthenticated) {
-                const response = await axios.get(`${API_URL}?name=${encodeURIComponent(searchTerm.trim())}`);
-                setTodos(response.data);
+                const response = await apiCall('get', `${API_URL}?name=${encodeURIComponent(searchTerm.trim())}`);
+                setTodos(response);
                 setIsSearching(true);
             } else {
                 const filtered = originalTodos.filter(todo =>
@@ -135,12 +190,12 @@ function App() {
         }
 
         try {
-            const response = await axios.get(`${API_URL}/${id}`);
+            const response = await apiCall('get', `${API_URL}/${id}`);
             setFormData({
-                title: response.data.title,
-                description: response.data.description,
-                isCompleted: response.data.isCompleted,
-                dueDate: response.data.dueDate ? response.data.dueDate.slice(0, 16) : ''
+                title: response.title,
+                description: response.description,
+                isCompleted: response.isCompleted,
+                dueDate: response.dueDate ? response.dueDate.slice(0, 16) : ''
             });
             setEditingId(id);
         } catch (error) {
@@ -154,25 +209,59 @@ function App() {
         if (!isAuthenticated) return;
 
         try {
-            const response = await axios.get(`${SUBTASK_API_URL}/todo/${todoId}`);
-            setSubtasks(prev => ({ ...prev, [todoId]: response.data }));
+            const response = await apiCall('get', `${SUBTASK_API_URL}/todo/${todoId}`);
+            setSubtasks(prev => ({ ...prev, [todoId]: response }));
         } catch (error) {
             console.error('Error fetching subtasks:', error);
         }
     };
 
-    const toggleSubtaskExpand = (todoId) => {
+    // ATTACHMENT FUNCTIONS (only for authenticated users)
+    const fetchAttachments = async (todoId) => {
+        if (!isAuthenticated) return;
+
+        try {
+            const response = await apiCall('get', `${ATTACHMENT_API_URL}/todo/${todoId}`);
+            setAttachments(prev => ({ ...prev, [todoId]: response }));
+        } catch (error) {
+            console.error('Error fetching attachments:', error);
+        }
+    };
+
+    const toggleTodoExpand = (todoId) => {
         if (!isAuthenticated) {
-            alert('Subtasks are only available for registered users. Please login or register.');
+            alert('Advanced features are only available for registered users. Please login or register.');
             return;
         }
 
         if (expandedTodoId === todoId) {
             setExpandedTodoId(null);
+            setExpandedSections(prev => ({ ...prev, [todoId]: { subtasks: false, attachments: false } }));
         } else {
             setExpandedTodoId(todoId);
-            if (!subtasks[todoId]) {
+            setExpandedSections(prev => ({ 
+                ...prev, 
+                [todoId]: { subtasks: false, attachments: false } 
+            }));
+        }
+    };
+
+    const toggleSection = (todoId, section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [todoId]: {
+                ...prev[todoId],
+                [section]: !prev[todoId]?.[section]
+            }
+        }));
+
+        // Fetch data when section is expanded
+        if (!expandedSections[todoId]?.[section]) {
+            if (section === 'subtasks' && !subtasks[todoId]) {
                 fetchSubtasks(todoId);
+            }
+            if (section === 'attachments' && !attachments[todoId]) {
+                fetchAttachments(todoId);
             }
         }
     };
@@ -194,7 +283,7 @@ function App() {
                 position: subtasks[todoId] ? subtasks[todoId].length : 0
             };
 
-            await axios.post(SUBTASK_API_URL, newSubtask);
+            await apiCall('post', SUBTASK_API_URL, newSubtask);
             setNewSubtaskText(prev => ({ ...prev, [todoId]: '' }));
             fetchSubtasks(todoId);
         } catch (error) {
@@ -208,7 +297,7 @@ function App() {
 
         try {
             const updated = { ...subtask, isCompleted: !subtask.isCompleted };
-            await axios.put(`${SUBTASK_API_URL}/${subtask.id}`, updated);
+            await apiCall('put', `${SUBTASK_API_URL}/${subtask.id}`, updated);
             fetchSubtasks(subtask.todoId);
         } catch (error) {
             console.error('Error updating subtask:', error);
@@ -221,11 +310,51 @@ function App() {
 
         if (window.confirm('Delete this subtask?')) {
             try {
-                await axios.delete(`${SUBTASK_API_URL}/${subtaskId}`);
+                await apiCall('delete', `${SUBTASK_API_URL}/${subtaskId}`);
                 fetchSubtasks(todoId);
             } catch (error) {
                 console.error('Error deleting subtask:', error);
                 alert('Failed to delete subtask');
+            }
+        }
+    };
+
+    // ATTACHMENT HANDLERS
+    const handleUploadAttachment = async (todoId, file) => {
+        if (!isAuthenticated) return;
+
+        setUploadingAttachment(prev => ({ ...prev, [todoId]: true }));
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('todoId', todoId);
+
+            // Use the apiUpload helper which adds auth headers
+            const response = await apiUpload(ATTACHMENT_API_URL, formData);
+
+            // Refresh attachments list
+            fetchAttachments(todoId);
+            return response;
+        } catch (error) {
+            console.error('Error uploading attachment:', error);
+            alert('Failed to upload attachment');
+            throw error;
+        } finally {
+            setUploadingAttachment(prev => ({ ...prev, [todoId]: false }));
+        }
+    };
+
+    const handleDeleteAttachment = async (attachmentId, todoId) => {
+        if (!isAuthenticated) return;
+
+        if (window.confirm('Delete this attachment?')) {
+            try {
+                await apiCall('delete', `${ATTACHMENT_API_URL}/${attachmentId}`);
+                fetchAttachments(todoId);
+            } catch (error) {
+                console.error('Error deleting attachment:', error);
+                alert('Failed to delete attachment');
             }
         }
     };
@@ -259,8 +388,8 @@ function App() {
             };
 
             if (isAuthenticated) {
-                const response = await axios.post(API_URL, newTodo);
-                const updatedTodos = [...todos, response.data];
+                const response = await apiCall('post', API_URL, newTodo);
+                const updatedTodos = [...todos, response];
                 setTodos(updatedTodos);
                 if (!isSearching) {
                     setOriginalTodos(updatedTodos);
@@ -298,9 +427,9 @@ function App() {
             };
 
             if (isAuthenticated) {
-                const response = await axios.put(`${API_URL}/${editingId}`, updatedTodo);
+                const response = await apiCall('put', `${API_URL}/${editingId}`, updatedTodo);
                 const updatedTodos = todos.map(todo =>
-                    todo.id === editingId ? response.data : todo
+                    todo.id === editingId ? response : todo
                 );
                 setTodos(updatedTodos);
                 if (!isSearching) {
@@ -329,7 +458,7 @@ function App() {
         if (window.confirm('Are you sure you want to delete this todo?')) {
             try {
                 if (isAuthenticated) {
-                    await axios.delete(`${API_URL}/${id}`);
+                    await apiCall('delete', `${API_URL}/${id}`);
                 }
                 const updatedTodos = todos.filter(todo => todo.id !== id);
                 setTodos(updatedTodos);
@@ -371,6 +500,11 @@ function App() {
         setShowAuthModal(false);
     };
 
+    // Get attachment count for a todo
+    const getAttachmentCount = (todoId) => {
+        return attachments[todoId]?.length || 0;
+    };
+
     return (
         <>
             <Navbar
@@ -381,7 +515,7 @@ function App() {
             <div className="app-container">
                 <header className="header">
                     <h1>📝 My Todo Application</h1>
-                    <p>Manage your tasks efficiently with subtasks</p>
+                    <p>Manage your tasks efficiently with subtasks and attachments</p>
                 </header>
 
                 <main className="main-content">
@@ -520,6 +654,7 @@ function App() {
                                 {todos.map(todo => {
                                     const progress = calculateProgress(todo.id);
                                     const isExpanded = expandedTodoId === todo.id;
+                                    const attachmentCount = getAttachmentCount(todo.id);
 
                                     return (
                                         <div key={todo.id} className={`todo-card ${todo.isCompleted ? 'completed' : ''}`}>
@@ -554,12 +689,14 @@ function App() {
 
                                                 <div className="todo-actions">
                                                     {isAuthenticated && (
-                                                        <button
-                                                            className="btn btn-subtasks"
-                                                            onClick={() => toggleSubtaskExpand(todo.id)}
-                                                        >
-                                                            {isExpanded ? '▼ Hide' : '▶ Subtasks'}
-                                                        </button>
+                                                        <>
+                                                            <button
+                                                                className="btn btn-subtasks"
+                                                                onClick={() => toggleTodoExpand(todo.id)}
+                                                            >
+                                                                {isExpanded ? '▼ Hide Details' : '▶ Show Details'}
+                                                            </button>
+                                                        </>
                                                     )}
                                                     <button
                                                         className="btn btn-edit"
@@ -576,59 +713,119 @@ function App() {
                                                 </div>
                                             </div>
 
-                                            {/* Subtasks Section - Only for authenticated users */}
+                                            {/* Advanced Features Section - Only for authenticated users */}
                                             {isAuthenticated && isExpanded && (
-                                                <div className="subtasks-container">
-                                                    <h4>Subtasks</h4>
-
-                                                    {/* Add Subtask Input */}
-                                                    <div className="add-subtask">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Add a subtask..."
-                                                            value={newSubtaskText[todo.id] || ''}
-                                                            onChange={(e) => setNewSubtaskText(prev => ({
-                                                                ...prev,
-                                                                [todo.id]: e.target.value
-                                                            }))}
-                                                            onKeyPress={(e) => {
-                                                                if (e.key === 'Enter') {
-                                                                    addSubtask(todo.id);
-                                                                }
-                                                            }}
-                                                        />
-                                                        <button
-                                                            className="btn btn-add-subtask"
-                                                            onClick={() => addSubtask(todo.id)}
+                                                <div className="advanced-features-container">
+                                                    {/* Subtasks Section */}
+                                                    <div className="feature-section">
+                                                        <button 
+                                                            className="feature-header"
+                                                            onClick={() => toggleSection(todo.id, 'subtasks')}
                                                         >
-                                                            + Add
+                                                            <span>📋 Subtasks</span>
+                                                            <span className="feature-toggle">
+                                                                {expandedSections[todo.id]?.subtasks ? '▲' : '▼'}
+                                                            </span>
                                                         </button>
-                                                    </div>
+                                                        
+                                                        {expandedSections[todo.id]?.subtasks && (
+                                                            <div className="subtasks-container">
+                                                                {/* Add Subtask Input */}
+                                                                <div className="add-subtask">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Add a subtask..."
+                                                                        value={newSubtaskText[todo.id] || ''}
+                                                                        onChange={(e) => setNewSubtaskText(prev => ({
+                                                                            ...prev,
+                                                                            [todo.id]: e.target.value
+                                                                        }))}
+                                                                        onKeyPress={(e) => {
+                                                                            if (e.key === 'Enter') {
+                                                                                addSubtask(todo.id);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <button
+                                                                        className="btn btn-add-subtask"
+                                                                        onClick={() => addSubtask(todo.id)}
+                                                                    >
+                                                                        + Add
+                                                                    </button>
+                                                                </div>
 
-                                                    {/* Subtask List */}
-                                                    <div className="subtasks-list">
-                                                        {(subtasks[todo.id] || []).map(subtask => (
-                                                            <div key={subtask.id} className="subtask-item">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={subtask.isCompleted}
-                                                                    onChange={() => toggleSubtaskCompletion(subtask)}
-                                                                />
-                                                                <span className={subtask.isCompleted ? 'completed-subtask' : ''}>
-                                                                    {subtask.title}
-                                                                </span>
-                                                                <button
-                                                                    className="btn-delete-subtask"
-                                                                    onClick={() => deleteSubtask(subtask.id, todo.id)}
-                                                                >
-                                                                    ×
-                                                                </button>
+                                                                {/* Subtask List */}
+                                                                <div className="subtasks-list">
+                                                                    {(subtasks[todo.id] || []).map(subtask => (
+                                                                        <div key={subtask.id} className="subtask-item">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={subtask.isCompleted}
+                                                                                onChange={() => toggleSubtaskCompletion(subtask)}
+                                                                            />
+                                                                            <span className={subtask.isCompleted ? 'completed-subtask' : ''}>
+                                                                                {subtask.title}
+                                                                            </span>
+                                                                            <button
+                                                                                className="btn-delete-subtask"
+                                                                                onClick={() => deleteSubtask(subtask.id, todo.id)}
+                                                                            >
+                                                                                ×
+                                                                            </button>
+                                                                        </div>
+                                                                    ))}
+                                                                    {(!subtasks[todo.id] || subtasks[todo.id].length === 0) && (
+                                                                        <p className="no-subtasks">No subtasks yet</p>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                        ))}
-                                                        {(!subtasks[todo.id] || subtasks[todo.id].length === 0) && (
-                                                            <p className="no-subtasks">No subtasks yet</p>
                                                         )}
                                                     </div>
+
+                                                    {/* Attachments Section */}
+                                                    <div className="feature-section">
+                                                        <button 
+                                                            className="feature-header"
+                                                            onClick={() => toggleSection(todo.id, 'attachments')}
+                                                        >
+                                                            <span>
+                                                                📎 Attachments 
+                                                                {attachmentCount > 0 && (
+                                                                    <span className="attachment-count-badge">
+                                                                        {attachmentCount}
+                                                                    </span>
+                                                                )}
+                                                            </span>
+                                                            <span className="feature-toggle">
+                                                                {expandedSections[todo.id]?.attachments ? '▲' : '▼'}
+                                                            </span>
+                                                        </button>
+                                                        
+                                                        {expandedSections[todo.id]?.attachments && (
+                                                            <div className="attachments-container">
+                                                                {/* Attachment Upload Component */}
+                                                                <AttachmentUpload
+                                                                    todoId={todo.id}
+                                                                    onUpload={handleUploadAttachment}
+                                                                    isUploading={uploadingAttachment[todo.id] || false}
+                                                                />
+
+                                                                {/* Attachment List Component */}
+                                                                <AttachmentList
+                                                                    attachments={attachments[todo.id] || []}
+                                                                    onDelete={handleDeleteAttachment}
+                                                                    todoId={todo.id}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Attachment Count Badge on Todo Card */}
+                                            {isAuthenticated && attachmentCount > 0 && (
+                                                <div className="attachment-badge">
+                                                    📎 {attachmentCount}
                                                 </div>
                                             )}
                                         </div>

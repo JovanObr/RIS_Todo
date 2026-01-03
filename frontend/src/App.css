@@ -555,3 +555,74 @@ body {
 .empty .btn-primary {
     margin-top: 1rem;
 }
+/* Attachment Styles */
+.attachment-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #4CAF50;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.attachment-count-badge {
+    background: #f44336;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    margin-left: 8px;
+}
+
+.feature-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.feature-header {
+    width: 100%;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: none;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.feature-header:hover {
+    background: #e9ecef;
+}
+
+.feature-toggle {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.attachments-container {
+    padding: 15px;
+    background: white;
+}
+
+/* Advanced Features Container */
+.advanced-features-container {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Make sure todo card has relative positioning for the badge */
+.todo-card {
+    position: relative;
+    padding-right: 60px; /* Make room for the badge */
+}
