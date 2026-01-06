@@ -39,6 +39,9 @@ public class Todo {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
