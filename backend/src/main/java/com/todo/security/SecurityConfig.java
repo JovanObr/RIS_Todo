@@ -39,12 +39,14 @@ public class SecurityConfig {
                         // Public endpoints - anyone can access
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/calendar/oauth2callback").permitAll()
 
                         // Admin endpoints - only admins
                         .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
 
                         // User endpoints - only authenticated users
                         .requestMatchers("/api/users/**", "/users/**").authenticated()
+                        .requestMatchers("/calendar/**").authenticated()
 
                         // Todo endpoints - authenticated users (guest mode handled in controller)
                         .requestMatchers("/api/todos/**", "/todos/**").permitAll()
