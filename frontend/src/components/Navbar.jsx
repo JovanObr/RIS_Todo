@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
-function Navbar({ onShowAuth, onShowAdmin }) {
+function Navbar({ onShowAuth, onShowAdmin, onShowCalendar, isCalendarConnected }) {
     const { user, isAuthenticated, logout, isAdmin } = useAuth();
 
     return (
@@ -13,6 +13,16 @@ function Navbar({ onShowAuth, onShowAdmin }) {
                 </div>
 
                 <div className="navbar-menu">
+                    {isAuthenticated && (
+                        <button 
+                            className={`navbar-btn ${isCalendarConnected ? 'btn-cal-connected' : 'btn-cal-disconnected'}`}
+                            onClick={onShowCalendar}
+                            title="Google Calendar Settings"
+                        >
+                            {isCalendarConnected ? '📅 ✅' : '📅 ❌'}
+                        </button>
+                    )}
+
                     {isAuthenticated ? (
                         <>
                             <span className="navbar-user">
@@ -21,33 +31,21 @@ function Navbar({ onShowAuth, onShowAdmin }) {
                             </span>
 
                             {isAdmin() && (
-                                <button
-                                    className="navbar-btn btn-admin"
-                                    onClick={onShowAdmin}
-                                >
+                                <button className="navbar-btn btn-admin" onClick={onShowAdmin}>
                                     📊 Dashboard
                                 </button>
                             )}
 
-                            <button
-                                className="navbar-btn btn-logout"
-                                onClick={logout}
-                            >
+                            <button className="navbar-btn btn-logout" onClick={logout}>
                                 🚪 Logout
                             </button>
                         </>
                     ) : (
                         <>
-                            <button
-                                className="navbar-btn btn-login"
-                                onClick={() => onShowAuth('login')}
-                            >
+                            <button className="navbar-btn btn-login" onClick={() => onShowAuth('login')}>
                                 🔐 Login
                             </button>
-                            <button
-                                className="navbar-btn btn-register"
-                                onClick={() => onShowAuth('register')}
-                            >
+                            <button className="navbar-btn btn-register" onClick={() => onShowAuth('register')}>
                                 📝 Register
                             </button>
                         </>
@@ -56,6 +54,6 @@ function Navbar({ onShowAuth, onShowAdmin }) {
             </div>
         </nav>
     );
-};
+}
 
 export default Navbar;

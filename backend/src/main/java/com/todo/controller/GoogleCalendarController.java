@@ -67,11 +67,11 @@ public class GoogleCalendarController {
             log.info("Successfully handled OAuth callback for user: {}", userId);
 
             // Redirect to frontend success page
-            return new RedirectView("http://localhost:5173/calendar-connected?success=true");
+            return new RedirectView("http://localhost:5173/?status=success");
 
         } catch (Exception e) {
             log.error("Error handling OAuth callback: {}", e.getMessage(), e);
-            return new RedirectView("http://localhost:5173/calendar-connected?success=false&error=" + e.getMessage());
+            return new RedirectView("http://localhost:5173/?status=error" + e.getMessage());
         }
     }
 

@@ -626,3 +626,321 @@ body {
     position: relative;
     padding-right: 60px; /* Make room for the badge */
 }
+/* Sync Status Icons */
+.sync-status {
+    font-size: 0.85rem;
+    margin-left: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #f0f4f8;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+/* Animation for the "Pending" hourglass */
+.sync-status[title="Not Synced"] {
+    animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Navbar Calendar Buttons */
+.btn-cal-connected {
+    background-color: #e6fffa;
+    border: 1px solid #38b2ac;
+    color: #2c7a7b;
+}
+
+.btn-cal-disconnected {
+    background-color: #fff5f5;
+    border: 1px solid #feb2b2;
+    filter: grayscale(1);
+    opacity: 0.7;
+}
+
+.btn-cal-disconnected:hover {
+    filter: grayscale(0);
+    opacity: 1;
+}
+
+/* Calendar Success Screen */
+.calendar-success-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7fafc;
+}
+
+.success-card {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.success-card .icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+/* Calendar Settings Modal */
+.calendar-settings-modal {
+    max-width: 400px;
+    border-top: 5px solid #4285F4; /* Google Blue */
+}
+
+.calendar-settings-modal h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setup-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+.connection-info {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.connection-info p {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.btn-close {
+    width: 100%;
+    margin-top: 10px;
+    background: none;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-close:hover {
+    background: #f0f0f0;
+}
+.calendar-success-page {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+.success-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px;
+    animation: slideUp 0.5s ease-out;
+}
+
+.success-card .icon {
+    font-size: 50px;
+    display: block;
+    margin-bottom: 20px;
+    animation: growAndRotate 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes growAndRotate {
+    0% { transform: scale(0) rotate(-45deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+.success-card h1 {
+    color: #1a73e8;
+    margin-bottom: 10px;
+}
+
+.success-card p {
+    color: #5f6368;
+    margin-bottom: 25px;
+}
+.sync-status {
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.sync-status:hover {
+    transform: scale(1.2);
+}
+
+/* Green glow for synced items */
+.sync-status[title="Synced to Google"] {
+    text-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
+}
+
+/* Orange/Amber pulse for items waiting to be synced */
+.sync-status[title="Not Synced"] {
+    filter: saturate(0.5);
+    opacity: 0.8;
+}
+/* The dark background behind the modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* The actual white box */
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: scaleUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+/* Specific blue accent for Google */
+.calendar-settings-modal {
+    border-top: 6px solid #4285F4; 
+}
+
+.modal-body p {
+    color: #444;
+    line-height: 1.6;
+}
+
+.setup-info {
+    background: #f1f5f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.connection-info {
+    text-align: center;
+    padding: 20px;
+    background: #f0fff4;
+    border-radius: 8px;
+    border: 1px solid #c6f6d5;
+}
+
+.connection-info p {
+    color: #2f855a;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+/* Full screen success overlay for non-router apps */
+.calendar-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white; /* Or use a gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; /* Higher than other modals */
+    animation: fadeIn 0.4s ease;
+}
+
+.success-card {
+    text-align: center;
+    padding: 40px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 400px;
+}
+
+.success-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 20px;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.calendar-success-overlay h1 {
+    color: #1a73e8;
+    margin-bottom: 15px;
+}
+
+.calendar-success-overlay p {
+    color: #5f6368;
+    margin-bottom: 25px;
+}
