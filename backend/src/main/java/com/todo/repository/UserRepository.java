@@ -28,4 +28,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'ADMIN'")
     long countAdmins();
+
+    Optional<User> findByProviderAndProviderId(String provider, String providerId);
+
+    Boolean existsByProviderAndProviderId(String provider, String providerId);
 }

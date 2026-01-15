@@ -33,6 +33,16 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    // OAuth2 fields
+    @Column(name = "provider", length = 20)
+    private String provider = "LOCAL"; // LOCAL, GOOGLE, FACEBOOK, GITHUB
+
+    @Column(name = "provider_id")
+    private String providerId; // Unique ID from OAuth provider
+
+    @Column(name = "profile_picture_url", length = 500)
+    private String profilePictureUrl; // Profile picture from OAuth provider
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -46,6 +56,9 @@ public class User {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (provider == null) {
+            provider = "LOCAL";
+        }
     }
 
     @PreUpdate
