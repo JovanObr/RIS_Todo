@@ -26,8 +26,8 @@ public class UserController {
         }
 
         String username = authentication.getName();
-        return userService.getUserByUsername(username)
-                .map(user -> ResponseEntity.ok(user))
+        return userService.getUserDTOByUsername(username)
+                .map(userDTO -> ResponseEntity.ok(userDTO))
                 .orElse(ResponseEntity.notFound().build());
     }
 

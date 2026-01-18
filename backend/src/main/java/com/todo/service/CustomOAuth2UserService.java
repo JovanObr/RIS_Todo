@@ -21,6 +21,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private GoogleCalendarService googleCalendarService;
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
@@ -37,10 +40,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         String providerId = extractProviderId(registrationId, attributes);
-        String email = (String) attributes.get("email");
+        String email = extractEmail(registrationId, attributes, oAuth2UserRequest);
         String imageUrl = extractImageUrl(registrationId, attributes);
 
-        if (!StringUtils.hasLength(email)) {
+        // For GitHub, if email is null (user has private email), use login@github as identifier
+        if (!StringUtils.hasLength(email) && "github".equals(registrationId)) {
+            String login = (String) attributes.get("login");
+            if (StringUtils.hasLength(login)) {
+                email = login + "@github.local";
+            } else {
+                throw new OAuth2AuthenticationException("Unable to get user identifier from " + provider);
+            }
+        } else if (!StringUtils.hasLength(email)) {
             throw new OAuth2AuthenticationException("Email not found from " + provider);
         }
 
@@ -71,7 +82,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setPassword("OAUTH2_USER");
         user.setRole(Role.USER);
         user.setIsActive(true);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        
+        // Auto-connect Google Calendar if user signed up with Google
+        if ("GOOGLE".equals(provider)) {
+            try {
+                googleCalendarService.autoConnectGoogleCalendar(user.getId(), providerId);
+            } catch (Exception e) {
+                // Log but don't fail registration if calendar connection fails
+                System.err.println("Failed to auto-connect Google Calendar: " + e.getMessage());
+            }
+        }
+        
+        return user;
     }
 
     private User updateExistingUser(User user, String imageUrl) {
@@ -90,6 +113,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if ("google".equals(regId)) return (String) attributes.get("sub");
         if ("facebook".equals(regId) || "github".equals(regId)) return String.valueOf(attributes.get("id"));
         return null;
+    }
+
+    private String extractEmail(String regId, Map<String, Object> attributes, OAuth2UserRequest oAuth2UserRequest) {
+        String email = (String) attributes.get("email");
+        
+        // GitHub special handling - email might be null if user has private email
+        if ("github".equals(regId) && !StringUtils.hasLength(email)) {
+            // Try to get primary email from the emails list
+            // GitHub returns emails as a separate endpoint, but Spring Security fetches user attributes only
+            // We'll use login as fallback
+            return null; // Will be handled in processOAuth2User with login@github.local
+        }
+        
+        return email;
     }
 
     private String extractImageUrl(String regId, Map<String, Object> attributes) {

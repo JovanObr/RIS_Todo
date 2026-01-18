@@ -38,6 +38,11 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    // Get user DTO by username
+    public Optional<UserDTO> getUserDTOByUsername(String username) {
+        return userRepository.findByUsername(username).map(this::convertToDTO);
+    }
+
     // Delete user (Admin only)
     @Transactional
     public boolean deleteUser(Integer id) {
@@ -75,7 +80,8 @@ public class UserService {
                 user.getRole().name(),
                 user.getIsActive(),
                 user.getCreatedAt(),
-                todoCount
+                todoCount,
+                user.getProfilePictureUrl()
         );
     }
 }

@@ -60,6 +60,17 @@ export const AuthProvider = ({ children }) => {
         return authService.isAdmin();
     };
 
+    const setAuthToken = async (token) => {
+        try {
+            await authService.setOAuthToken(token);
+            setUser(authService.getCurrentUser());
+            setIsAuthenticated(true);
+        } catch (error) {
+            console.error('Failed to set OAuth token:', error);
+            throw error;
+        }
+    };
+
     const value = {
         user,
         isAuthenticated,
@@ -67,7 +78,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        isAdmin
+        isAdmin,
+        setAuthToken
     };
 
     return (

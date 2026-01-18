@@ -85,6 +85,26 @@ class AuthService {
         return this.token;
     }
 
+    // Set OAuth token (for OAuth2 login)
+    async setOAuthToken(token) {
+        this.token = token;
+        localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // Fetch user details with the token
+        try {
+            const response = await axios.get('http://localhost:8080/api/users/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            this.user = response.data;
+            localStorage.setItem('user', JSON.stringify(response.data));
+        } catch (error) {
+            console.error('Failed to fetch user data after OAuth login:', error);
+            // If fetching user fails, still set the token but user will be null
+        }
+    }
+
     // Validate token
     async validateToken() {
         if (!this.token) return false;

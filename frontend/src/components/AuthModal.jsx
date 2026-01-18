@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import SocialLoginButtons from './SocialLoginButtons';
 import './AuthModal.css';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
@@ -159,6 +160,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         {loading ? 'Please wait...' : (mode === 'login' ? 'Login' : 'Register')}
                     </button>
                 </form>
+
+                <SocialLoginButtons />
 
                 <div className="auth-switch">
                     {mode === 'login' ? (

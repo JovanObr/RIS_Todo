@@ -26,7 +26,20 @@ function Navbar({ onShowAuth, onShowAdmin, onShowCalendar, isCalendarConnected }
                     {isAuthenticated ? (
                         <>
                             <span className="navbar-user">
-                                👤 {user?.username}
+                                {user?.profilePictureUrl ? (
+                                    <img 
+                                        src={user.profilePictureUrl} 
+                                        alt={user.username}
+                                        className="navbar-profile-pic"
+                                        onError={(e) => { 
+                                            e.target.style.display = 'none'; 
+                                            const emojiSpan = e.target.parentElement.querySelector('.profile-emoji');
+                                            if (emojiSpan) emojiSpan.style.display = 'inline';
+                                        }}
+                                    />
+                                ) : null}
+                                <span className="profile-emoji" style={{ display: user?.profilePictureUrl ? 'none' : 'inline' }}>👤</span>
+                                {' '}{user?.username}
                                 {isAdmin() && <span className="admin-badge">ADMIN</span>}
                             </span>
 

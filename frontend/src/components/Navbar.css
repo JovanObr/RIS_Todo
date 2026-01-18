@@ -40,6 +40,15 @@
     backdrop-filter: blur(10px);
 }
 
+.navbar-profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .admin-badge {
     background: #ff9800;
     color: white;

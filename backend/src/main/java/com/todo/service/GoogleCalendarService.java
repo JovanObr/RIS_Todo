@@ -127,6 +127,29 @@ public class GoogleCalendarService {
     }
 
     /**
+     * Auto-connect Google Calendar for users who signed in with Google OAuth
+     * Note: This only marks readiness. Users still need to explicitly authorize calendar access
+     * because OAuth login scopes (profile,email) differ from calendar scopes (calendar.events)
+     */
+    @Transactional
+    public void autoConnectGoogleCalendar(Integer userId, String googleProviderId) {
+        try {
+            // Check if already connected
+            if (tokenRepository.existsByUserId(userId)) {
+                log.info("User {} already has Google Calendar connected", userId);
+                return;
+            }
+
+            log.info("User {} signed in with Google. Calendar connection available.", userId);
+            // Users who sign in with Google can easily connect their calendar later
+            // They just need to go through the calendar authorization flow
+            
+        } catch (Exception e) {
+            log.error("Failed to prepare Google Calendar connection: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
      * Check if user has connected their Google Calendar
      */
     public boolean isCalendarConnected(Integer userId) {

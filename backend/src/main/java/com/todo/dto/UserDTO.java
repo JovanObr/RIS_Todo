@@ -18,6 +18,7 @@ public class UserDTO {
     private Boolean isActive;
     private LocalDateTime createdAt;
     private Integer todoCount;
+    private String profilePictureUrl;
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -31,5 +32,6 @@ public class UserDTO {
 
         this.createdAt = user.getCreatedAt();
         this.todoCount = user.getTodos().size();
+        this.profilePictureUrl = user.getProfilePictureUrl();
     }
 }

@@ -8,6 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AttachmentUpload from './components/AttachmentUpload';
 import AttachmentList from './components/AttachmentList';
 import GoogleCalendarSettings from './components/GoogleCalendarSettings';
+import OAuth2RedirectHandler from './components/OAuth2RedirectHandler';
 import authService from './services/authService';
 import './App.css';
 
@@ -281,6 +282,11 @@ function App() {
     };
 
     const resetForm = () => { setFormData({ title: '', description: '', isCompleted: false, dueDate: '' }); setEditingId(null); };
+
+    // Handle OAuth2 redirect
+    if (window.location.pathname === '/oauth2/redirect') {
+        return <OAuth2RedirectHandler />;
+    }
 
     return (
         <>
